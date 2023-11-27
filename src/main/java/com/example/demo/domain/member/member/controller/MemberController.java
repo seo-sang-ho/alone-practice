@@ -3,8 +3,6 @@ package com.example.demo.domain.member.member.controller;
 import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -28,7 +26,7 @@ public class MemberController {
     }
 
     @Data
-    public static class WriteForm{
+    public static class JoinForm{
         @NotBlank
         private String username;
         @NotBlank
@@ -36,13 +34,38 @@ public class MemberController {
     }
 
     @PostMapping("/member/join")
-    String doWrite(@Valid WriteForm joinForm, HttpServletRequest req, HttpServletResponse resp){
+    String doWrite(@Valid JoinForm joinForm){
 
         Member member = memberService.join(joinForm.username, joinForm.password);
 
         return rq.redirect("/member/login","회원가입이 완료되었습니다.");
     }
 
+    @GetMapping("/member/login")
+    String login(){
+        return "member/member/login";
+    }
+
+    @Data
+    public static class LoginForm{
+        @NotBlank
+        private String username;
+        @NotBlank
+        private String password;
+    }
+
+    @PostMapping("/member/login")
+    String doLogin(@Valid LoginForm loginForm){
+        Member member = memberService.findByUsername(loginForm.username).get();
+        
+        if( !member.getPassword().equals(loginForm.password)){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        
+        // 로그인 처리
+
+        return rq.redirect("/article/list","로그인이 완료되었습니다.");
+    }
     
 }
 
