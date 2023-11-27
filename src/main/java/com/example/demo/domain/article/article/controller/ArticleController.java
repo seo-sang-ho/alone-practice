@@ -2,35 +2,101 @@ package com.example.demo.domain.article.article.controller;
 
 import com.example.demo.domain.article.article.entity.Article;
 import com.example.demo.domain.article.article.service.ArticleService;
+import com.example.demo.global.rq.Rq;
 import com.example.demo.global.rsData.RsData;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 @Controller
 @RequiredArgsConstructor
+@Validated
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final Rq rq;
+
+    @GetMapping("/article/modify/{id}")
+    String modify(Model model,@PathVariable long id){
+        Article article = articleService.findById(id).get();
+
+        model.addAttribute("article",article);
+
+        String msg = "id %d, article deleted".formatted(id);
+
+        return "article/article/modify";
+    }
+
+    @Data
+    public static class ModifyForm{
+        @NotBlank
+        private String title;
+        @NotBlank
+        private String body;
+    }
+
+    @PostMapping("/article/modify/{id}")
+    String modify(@Valid ModifyForm modifyForm, @PathVariable("id") long id){
+
+        articleService.modify(id,modifyForm.title, modifyForm.body);
+
+        return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
+    }
+
+    @GetMapping("/article/delete/{id}")
+    String delete(@PathVariable long id){
+        articleService.delete(id);
+
+        return rq.redirect("/article/list","%d번 게시물 삭제되었습니다.".formatted(id));
+    }
 
     @GetMapping("/article/write")
     String showWrite(){
-        return "article/write";
+        return "article/article/write";
+    }
+
+    @Data
+    public static class WriteForm{
+        @NotBlank
+        private String title;
+        @NotBlank
+        private String body;
     }
 
     @PostMapping("/article/write")
-    @ResponseBody
-    RsData<Article> doWrite(String title, String body){
+    String doWrite(@Valid WriteForm writeForm, HttpServletRequest req, HttpServletResponse resp){
 
-        Article article = articleService.write(title, body);
+        Article article = articleService.write(writeForm.title, writeForm.body);
 
-        RsData<Article> rs = new RsData<>("S-1","%d번 게시물이 추가되었습니다".formatted(article.getId()),article);
+        return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
+    }
 
-        return rs;
+    @GetMapping("/article/detail/{id}")
+    String showDetail(Model model,@PathVariable long id){
+        Article article = articleService.findById(id).get();
+
+        model.addAttribute("article",article);
+
+        return "article/article/detail";
     }
 
     @GetMapping("/article/getLastArticle")
@@ -44,5 +110,15 @@ public class ArticleController {
     List<Article> getArticles(){
         return articleService.findAll();
     }
+
+    @GetMapping("/article/list")
+    String showList(Model model){
+        List<Article> articles = articleService.findAll();
+
+        model.addAttribute("articles",articles);
+
+        return "article/article/list";
+    }
+
 }
 

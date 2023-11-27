@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +28,19 @@ public class ArticleService {
 
     public List<Article> findAll() {
         return articleRepository.findAll();
+    }
+
+    public Optional<Article> findById(long id) {
+        return articleRepository.findById(id);
+    }
+
+    public void delete(long id) {
+        articleRepository.delete(id);
+    }
+
+    public void modify(long id, String title, String body) {
+        Article article = findById(id).get();
+        article.setTitle(title);
+        article.setBody(body);
     }
 }
