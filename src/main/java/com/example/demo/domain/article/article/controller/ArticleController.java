@@ -5,17 +5,12 @@ import com.example.demo.domain.article.article.service.ArticleService;
 import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
-import com.example.demo.global.rsData.RsData;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -24,9 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -115,26 +109,11 @@ public class ArticleController {
 
     @GetMapping("/article/list")
     String showList(Model model,HttpServletRequest req){
-        long opLoginedMemberId = Optional.ofNullable(req.getCookies())
-                .stream()
-                .flatMap(Arrays::stream)
-                .filter(cookie -> cookie.getName().equals("loginedMemberId"))
-                .map(Cookie::getValue)
-                .mapToLong(Long::parseLong)
-                .findFirst()
-                .orElse(0);
+        long fromSessionLoginMemberId = Optional
+                .ofNullable(req.getSession().getAttribute("loginedMemberId"))
+                .map(id -> (long) id)
+                .orElse(0L);
 
-
-        if( opLoginedMemberId > 0 ){
-            Member loginedMember = memberService.findById(opLoginedMemberId).get();
-            model.addAttribute("loginedMember",loginedMember);
-        }
-
-        long fromSessionLoginMemberId = 0;
-
-        if(req.getSession().getAttribute("loginedMemberId") != null){
-            fromSessionLoginMemberId = (long) req.getSession().getAttribute("loginedMemberId");
-        }
 
         if(fromSessionLoginMemberId > 0 ){
             Member fromSessionLoginedMember = memberService.findById(fromSessionLoginMemberId).get();
