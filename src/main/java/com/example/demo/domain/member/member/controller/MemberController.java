@@ -5,7 +5,6 @@ import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -65,11 +64,16 @@ public class MemberController {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        HttpSession session = req.getSession();
-        session.setAttribute("loginedMemberId",member.getId());
+        rq.setSessionAttr("loginedMemberId",member.getId()); // rq = 현재 접속한 브라우저
 
         return rq.redirect("/article/list","로그인이 완료되었습니다.");
     }
-    
+
+    @GetMapping("/member/logout")
+    String logout(){
+        rq.removeSessionAttr("logindMemberId");
+
+        return rq.redirect("/article/list","로그아웃 되었습니다.");
+    }
 }
 

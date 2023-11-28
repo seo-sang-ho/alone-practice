@@ -2,6 +2,7 @@ package com.example.demo.domain.article.article.controller;
 
 import com.example.demo.domain.article.article.entity.Article;
 import com.example.demo.domain.article.article.service.ArticleService;
+import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +51,9 @@ public class ArticleController {
 
     @PostMapping("/article/modify/{id}")
     String modify(@Valid ModifyForm modifyForm, @PathVariable("id") long id){
+        if(!rq.isLogined()){
+            throw new RuntimeException("로그인 후 입력해주세요.");
+        }
 
         articleService.modify(id,modifyForm.title, modifyForm.body);
 
@@ -58,6 +62,10 @@ public class ArticleController {
 
     @GetMapping("/article/delete/{id}")
     String delete(@PathVariable long id){
+        if(!rq.isLogined()){
+            throw new RuntimeException("로그인 후 입력해주세요.");
+        }
+
         articleService.delete(id);
 
         return rq.redirect("/article/list","%d번 게시물 삭제되었습니다.".formatted(id));
@@ -77,9 +85,12 @@ public class ArticleController {
     }
 
     @PostMapping("/article/write")
-    String doWrite(@Valid WriteForm writeForm, HttpServletRequest req, HttpServletResponse resp){
+    String doWrite(@Valid WriteForm writeForm){
+        if(!rq.isLogined()){
+            throw new RuntimeException("로그인 후 입력해주세요.");
+        }
 
-        Article article = articleService.write(writeForm.title, writeForm.body);
+        Article article = articleService.write(rq.getMember(),writeForm.title, writeForm.body);
 
         return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }

@@ -4,6 +4,7 @@ import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -52,5 +53,13 @@ public class Rq {
         }
 
         return member;
+    }
+
+    public void setSessionAttr(String name, long value) {
+        req.getSession().setAttribute(name,value);
+    }
+
+    public void removeSessionAttr(String name) {
+        req.getSession().removeAttribute(name);
     }
 }
