@@ -2,7 +2,6 @@ package com.example.demo.domain.article.article.controller;
 
 import com.example.demo.domain.article.article.entity.Article;
 import com.example.demo.domain.article.article.service.ArticleService;
-import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -109,17 +107,6 @@ public class ArticleController {
 
     @GetMapping("/article/list")
     String showList(Model model,HttpServletRequest req){
-        long fromSessionLoginMemberId = Optional
-                .ofNullable(req.getSession().getAttribute("loginedMemberId"))
-                .map(id -> (long) id)
-                .orElse(0L);
-
-
-        if(fromSessionLoginMemberId > 0 ){
-            Member fromSessionLoginedMember = memberService.findById(fromSessionLoginMemberId).get();
-            model.addAttribute("fromSessionLoginedMember",fromSessionLoginedMember);
-        }
-
         List<Article> articles = articleService.findAll();
 
         model.addAttribute("articles",articles);
