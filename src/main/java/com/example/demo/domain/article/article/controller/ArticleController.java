@@ -2,9 +2,12 @@ package com.example.demo.domain.article.article.controller;
 
 import com.example.demo.domain.article.article.entity.Article;
 import com.example.demo.domain.article.article.service.ArticleService;
+import com.example.demo.domain.member.member.entity.Member;
+import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
 import com.example.demo.global.rsData.RsData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,9 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ import java.util.OptionalInt;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final MemberService memberService;
     private final Rq rq;
 
     @GetMapping("/article/modify/{id}")
@@ -112,7 +114,33 @@ public class ArticleController {
     }
 
     @GetMapping("/article/list")
-    String showList(Model model){
+    String showList(Model model,HttpServletRequest req){
+        long opLoginedMemberId = Optional.ofNullable(req.getCookies())
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(cookie -> cookie.getName().equals("loginedMemberId"))
+                .map(Cookie::getValue)
+                .mapToLong(Long::parseLong)
+                .findFirst()
+                .orElse(0);
+
+
+        if( opLoginedMemberId > 0 ){
+            Member loginedMember = memberService.findById(opLoginedMemberId).get();
+            model.addAttribute("loginedMember",loginedMember);
+        }
+
+        long fromSessionLoginMemberId = 0;
+
+        if(req.getSession().getAttribute("loginedMemberId") != null){
+            fromSessionLoginMemberId = (long) req.getSession().getAttribute("loginedMemberId");
+        }
+
+        if(fromSessionLoginMemberId > 0 ){
+            Member fromSessionLoginedMember = memberService.findById(fromSessionLoginMemberId).get();
+            model.addAttribute("fromSessionLoginedMember",fromSessionLoginedMember);
+        }
+
         List<Article> articles = articleService.findAll();
 
         model.addAttribute("articles",articles);
