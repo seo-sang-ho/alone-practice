@@ -1,12 +1,8 @@
 package com.example.demo.domain.article.article.repository;
 
 import com.example.demo.domain.article.article.entity.Article;
-import com.example.demo.domain.member.member.entity.Member;
-import com.example.demo.domain.member.member.repository.MemberRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +34,7 @@ public class ArticleRepository {
                 .findFirst();
     }
 
-    public void delete(long id) {
-        articles.removeIf(article -> article.getId() == id);
+    public void delete(Article article) {
+        articles.remove(article);
     }
 }

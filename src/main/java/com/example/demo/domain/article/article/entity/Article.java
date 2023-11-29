@@ -2,16 +2,15 @@ package com.example.demo.domain.article.article.entity;
 
 
 import com.example.demo.domain.member.member.entity.Member;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Article {
+    @EqualsAndHashCode.Include
     private Long id;
     private Member author;
     private String title;

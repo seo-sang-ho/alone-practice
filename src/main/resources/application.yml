@@ -1,2 +1,6 @@
 server:
   port: 8040
+spring:
+  devtools:
+    restart:
+      enabled: false

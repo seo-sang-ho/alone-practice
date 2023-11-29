@@ -2,11 +2,9 @@ package com.example.demo.domain.article.article.controller;
 
 import com.example.demo.domain.article.article.entity.Article;
 import com.example.demo.domain.article.article.service.ArticleService;
-import com.example.demo.domain.member.member.entity.Member;
 import com.example.demo.domain.member.member.service.MemberService;
 import com.example.demo.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -34,6 +32,11 @@ public class ArticleController {
     String modify(Model model,@PathVariable long id){
         Article article = articleService.findById(id).get();
 
+        if(!articleService.canModify(rq.getMember(),article)){
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        model.addAttribute("articleService",this);
         model.addAttribute("article",article);
 
         String msg = "id %d, article deleted".formatted(id);
@@ -51,22 +54,26 @@ public class ArticleController {
 
     @PostMapping("/article/modify/{id}")
     String modify(@Valid ModifyForm modifyForm, @PathVariable("id") long id){
-        if(!rq.isLogined()){
-            throw new RuntimeException("로그인 후 입력해주세요.");
+        Article article = articleService.findById(id).get();
+
+        if(!articleService.canModify(rq.getMember(),article)){
+            throw new RuntimeException("수정 권한이 없습니다.");
         }
 
-        articleService.modify(id,modifyForm.title, modifyForm.body);
+        articleService.modify(article,modifyForm.title, modifyForm.body);
 
         return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
     }
 
     @GetMapping("/article/delete/{id}")
     String delete(@PathVariable long id){
-        if(!rq.isLogined()){
-            throw new RuntimeException("로그인 후 입력해주세요.");
+        Article article = articleService.findById(id).get();
+
+        if(!articleService.canDelete(rq.getMember(),article)){
+            throw new RuntimeException("삭제 권한이 없습니다.");
         }
 
-        articleService.delete(id);
+        articleService.delete(article);
 
         return rq.redirect("/article/list","%d번 게시물 삭제되었습니다.".formatted(id));
     }
@@ -86,9 +93,6 @@ public class ArticleController {
 
     @PostMapping("/article/write")
     String doWrite(@Valid WriteForm writeForm){
-        if(!rq.isLogined()){
-            throw new RuntimeException("로그인 후 입력해주세요.");
-        }
 
         Article article = articleService.write(rq.getMember(),writeForm.title, writeForm.body);
 

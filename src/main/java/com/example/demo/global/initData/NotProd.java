@@ -21,7 +21,7 @@ public class NotProd {
 
             articleService.write(admin, "제목1", "내용1");
             articleService.write(user1, "제목2", "내용2");
-            articleService.write(user1, "제목3", "내용3");
+            articleService.write(user2, "제목3", "내용3");
         };
     }
 }
