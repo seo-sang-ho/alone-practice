@@ -71,7 +71,7 @@ public class MemberController {
 
     @GetMapping("/member/logout")
     String logout(){
-        rq.removeSessionAttr("logindMemberId");
+        rq.removeSessionAttr("loginedMemberId");
 
         return rq.redirect("/article/list","로그아웃 되었습니다.");
     }

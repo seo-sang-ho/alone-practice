@@ -1,5 +1,6 @@
 package com.example.demo.domain.article.article.entity;
 
+
 import com.example.demo.domain.member.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
