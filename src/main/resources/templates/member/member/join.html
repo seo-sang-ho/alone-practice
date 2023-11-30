@@ -1,5 +1,8 @@
 <html layout:decorate="~{global/layout}">
-<div layout:fragment="content" class="p-2">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
 <h2 class="font-bold mb-2"><i class="fa-solid fa-user-plus"></i> 회원가입</h2>
 
 
@@ -19,6 +22,13 @@
         <input type="password" placeholder="비밀번호을 입력하세요" name="password" class="input input-bordered" />
     </div>
 
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">비밀번호 확인</span>
+        </label>
+        <input type="password" placeholder="비밀번호을 다시 입력하세요" name="passwordConfirm" class="input input-bordered" />
+    </div>
+
 
     <button class="btn btn-primary btn-block" type="submit">
         <i class="fa-solid fa-user-plus"></i> 회원가입
@@ -28,24 +38,34 @@
 
 <script>
     function submitJoinForm(form){
-        const inputUsername = form.username;
-        const inputPassword = form.password;
+    form.username.value = form.username.value.trim();
 
-        inputUsername.value = inputUsername.value.trim();
-        inputPassword.value = inputPassword.value.trim();
-
-        const username = inputUsername.value;
-        const password = inputPassword.value;
-
-        if(username.length == 0 ){
+        if(form.username.value.length == 0 ){
             toastWarning("아이디을 입력해주세요.");
-            inputUsername.focus();
+            form.username.focus();
             return;
         }
 
-        if(password.length == 0 ){
+    form.password.value = form.password.value.trim();
+
+        if(form.password.value.length == 0 ){
             toastWarning("비밀번호을 입력해주세요.");
-            inputPassword.focus();
+            form.password.focus();
+            return;
+        }
+
+        form.passwordConfirm.value = form.passwordConfirm.value.trim();
+
+        if(form.passwordConfirm.value.length == 0 ){
+            toastWarning("비밀번호 확인 입력해주세요.");
+            form.passwordConfirm.focus();
+            return;
+        }
+
+        if(form.password.value != form.passwordConfirm.value){
+        toastWarning("비밀번호가 일치하지 않습니다.");
+        form.passwordConfirm.focus();
+
             return;
         }
 
@@ -53,5 +73,6 @@
     }
 </script>
 </div>
+</body>
 </html>
 

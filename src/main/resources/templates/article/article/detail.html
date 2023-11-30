@@ -1,18 +1,21 @@
 <html layout:decorate="~{global/layout}">
-<div layout:fragment="content" class="p-2">
+<head></head>
+<body>
+<div layout:fragment="content">
 
-<h1 class="font-bold mb-2"><i class="fa-solid fa-newspaper"></i> 글 상세 페이지</h1>
+    <h1 class="font-bold mb-2">
+        <i class="fa-solid fa-newspaper"></i>글 상세 페이지
+    </h1>
 
     <hr>
 
     <div class="mt-2">
-        <div class="badge badge-outline" th:text="${article.id}">default</div>
+        <div class="badge badge-outline" th:text="${article.id}"></div>
         <span th:text="${article.title}"></span>
     </div>
-    <div class="mt-2" th:text="${article.body}"></div>
+    <div class="mt-2 whitespace-pre-line" th:text="${article.body}"></div>
 
-
-<hr class="mt-2">
+    <hr class="mt-2">
 
     <div class="mt-2 flex gap-2 justify-center">
         <a th:if="${@articleService.canModify(@rq.member,article)}" class="btn-link" th:href="|/article/modify/${article.id}|">글 수정</a>
@@ -21,4 +24,6 @@
     </div>
 
 </div>
+</body>
+
 </html>

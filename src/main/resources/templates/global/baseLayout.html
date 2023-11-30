@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple</title>
+
+  <!-- 폰트어썸 불러오기 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- 제이쿼리 불러오기 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- toastr 불러오기 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+  <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/resources/global.css">
+  <script src="/resources/global.js"></script>
+
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
+</head>
+<body>
+
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.6/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+<header layout:fragment="header"></header>
+
+<script>
+    const queryParams = getQueryParams();
+
+    if ( queryParams.msg ) {
+        toastNotice(queryParams.msg);
+    }
+</script>
+
+
+<main class="p-4">
+<th:block layout:fragment="content"></th:block>
+</main>
+
+</body>
+</html>
