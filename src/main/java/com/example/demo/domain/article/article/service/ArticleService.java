@@ -51,9 +51,9 @@ public class ArticleService {
     }
 
     public boolean canDelete(Member actor, Article article) {
-        if(actor.isAdmin()) return true;  // 관리자는 삭제를 할 수 있어야함
-
         if(actor == null ) return false;
+
+        if(actor.isAdmin()) return true;  // 관리자는 삭제를 할 수 있어야함
 
         return article.getAuthor().equals(actor);
     }

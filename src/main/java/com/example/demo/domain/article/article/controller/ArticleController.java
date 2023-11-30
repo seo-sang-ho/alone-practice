@@ -9,26 +9,26 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("/article")
 public class ArticleController {
 
     private final ArticleService articleService;
     private final MemberService memberService;
     private final Rq rq;
 
-    @GetMapping("/article/modify/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify/{id}")
     String modify(Model model,@PathVariable long id){
         Article article = articleService.findById(id).get();
 
@@ -52,7 +52,8 @@ public class ArticleController {
         private String body;
     }
 
-    @PostMapping("/article/modify/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/modify/{id}")
     String modify(@Valid ModifyForm modifyForm, @PathVariable("id") long id){
         Article article = articleService.findById(id).get();
 
@@ -65,7 +66,8 @@ public class ArticleController {
         return rq.redirect("/article/list", "%d번 게시물 수정되었습니다.".formatted(id));
     }
 
-    @GetMapping("/article/delete/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete/{id}")
     String delete(@PathVariable long id){
         Article article = articleService.findById(id).get();
 
@@ -78,7 +80,8 @@ public class ArticleController {
         return rq.redirect("/article/list","%d번 게시물 삭제되었습니다.".formatted(id));
     }
 
-    @GetMapping("/article/write")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/write")
     String showWrite(){
         return "article/article/write";
     }
@@ -91,7 +94,8 @@ public class ArticleController {
         private String body;
     }
 
-    @PostMapping("/article/write")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/write")
     String doWrite(@Valid WriteForm writeForm){
 
         Article article = articleService.write(rq.getMember(),writeForm.title, writeForm.body);
@@ -99,7 +103,7 @@ public class ArticleController {
         return rq.redirect("/article/list","%d번 게시물이 생성되었습니다".formatted(article.getId()));
     }
 
-    @GetMapping("/article/detail/{id}")
+    @GetMapping("/detail/{id}")
     String showDetail(Model model,@PathVariable long id){
         Article article = articleService.findById(id).get();
 
@@ -108,19 +112,19 @@ public class ArticleController {
         return "article/article/detail";
     }
 
-    @GetMapping("/article/getLastArticle")
+    @GetMapping("/getLastArticle")
     @ResponseBody
     Article getLastArticle(){
         return articleService.findLastArticle();
     }
 
-    @GetMapping("/article/getArticles")
+    @GetMapping("/getArticles")
     @ResponseBody
     List<Article> getArticles(){
         return articleService.findAll();
     }
 
-    @GetMapping("/article/list")
+    @GetMapping("/list")
     String showList(Model model,HttpServletRequest req){
         List<Article> articles = articleService.findAll();
 

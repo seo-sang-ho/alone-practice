@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ public class MemberController {
     private final MemberService memberService;
     private final Rq rq;
 
+    @PreAuthorize("isAnonymous()")
     @GetMapping("/member/join")
     String showWrite(){
         return "member/member/join";
@@ -35,6 +38,7 @@ public class MemberController {
         private String password;
     }
 
+    @PreAuthorize("isAnonymous()")
     @PostMapping("/member/join")
     String doWrite(@Valid JoinForm joinForm){
 
@@ -43,38 +47,10 @@ public class MemberController {
         return rq.redirect("/member/login","회원가입이 완료되었습니다.");
     }
 
+    @PreAuthorize("isAnonymous()")
     @GetMapping("/member/login")
     String login(){
         return "member/member/login";
-    }
-
-    @Data
-    public static class LoginForm{
-        @NotBlank
-        private String username;
-        @NotBlank
-        private String password;
-    }
-
-    @PostMapping("/member/login")
-    String doLogin(@Valid LoginForm loginForm, HttpServletRequest req, HttpServletResponse response){
-        Member member = memberService.findByUsername(loginForm.username).get();
-        
-        if( !member.getPassword().equals(loginForm.password)){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
-        rq.setSessionAttr("loginedMemberId",member.getId()); // rq = 현재 접속한 브라우저
-        rq.setSessionAttr("authorities",member.getAuthorities() );
-
-        return rq.redirect("/article/list","로그인이 완료되었습니다.");
-    }
-
-    @GetMapping("/member/logout")
-    String logout(){
-        rq.removeSessionAttr("loginedMemberId");
-
-        return rq.redirect("/article/list","로그아웃 되었습니다.");
     }
 }
 
